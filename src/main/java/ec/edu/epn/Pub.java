@@ -9,7 +9,7 @@ public class Pub {
 
     public int computeCost(String drink, boolean student, int amount) {
 
-        if (amount > 2 && (drink == GT || drink == BACARDI_SPECIAL)) {
+        if (amount > 2 && (drink.equals(GT) || drink.equals(BACARDI_SPECIAL))) {
             throw new RuntimeException("Too many drinks, max 2.");
         }
         int price;
@@ -29,7 +29,7 @@ public class Pub {
         else {
             throw new RuntimeException("No such drink exists");
         }
-        if (student && (drink == ONE_CIDER || drink == ONE_BEER || drink == A_PROPER_CIDER)) {
+        if (student && (drink.equals(ONE_CIDER) || drink.equals(ONE_BEER) || drink.equals(A_PROPER_CIDER))) {
             price = price - price/10;
         }
         return price*amount;
@@ -49,7 +49,7 @@ public class Pub {
     private int ingredient3() {
         return 10;
     }
-    
+
     //one unit of green stuff
     private int ingredient4() {
         return 10;
