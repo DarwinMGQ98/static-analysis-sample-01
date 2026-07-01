@@ -1,48 +1,37 @@
 package ec.edu.epn;
 
 public class Pub {
-    public static final String ONE_BEER = "hansa";
-    public static final String ONE_CIDER = "grans";
-    public static final String A_PROPER_CIDER = "strongbow";
-    public static final String GT = "gt";
-    public static final String BACARDI_SPECIAL = "bacardi_special";
+    public static final String ONE_BEER = Drink.BEER.getCode();
+    public static final String ONE_CIDER = Drink.CIDER.getCode();
+    public static final String A_PROPER_CIDER = Drink.PROPER_CIDER.getCode();
+    public static final String GT = Drink.GIN_AND_TONIC.getCode();
+    public static final String BACARDI_SPECIAL = Drink.BACARDI_SPECIAL.getCode();
 
-    private static final int BEER_PRICE = 74;
-    private static final int CIDER_PRICE = 103;
-    private static final int PROPER_CIDER_PRICE = 110;
-    private static final int MAX_COCKTAIL_AMOUNT = 2;
+    private static final int MAX_COCKTAILS_PER_ORDER = 2;
     private static final int STUDENT_DISCOUNT_DIVISOR = 10;
-    private static final int RUM_PRICE = 65;
-    private static final int GRENADINE_PRICE = 10;
-    private static final int LIME_JUICE_PRICE = 10;
-    private static final int GREEN_STUFF_PRICE = 10;
-    private static final int TONIC_WATER_PRICE = 20;
-    private static final int GIN_PRICE = 85;
 
-    public int computeCost(String drink, boolean student, int amount) {
-        if (drink == null) {
-            throw new RuntimeException("Drink cannot be null");
+    public int computeCost(String drinkCode, boolean student, int amount) {
+        Drink drink = Drink.fromCode(drinkCode);
+        validateAmount(drink, amount);
+        int unitPrice = calculateUnitPrice(drink, student);
+        return unitPrice * amount;
+    }
+
+    private void validateAmount(Drink drink, int amount) {
+        if (drink.isCocktail() && amount > MAX_COCKTAILS_PER_ORDER) {
+            throw new RuntimeException("Too many drinks, max " + MAX_COCKTAILS_PER_ORDER + ".");
         }
-        if (amount > MAX_COCKTAIL_AMOUNT && (drink.equals(GT) || drink.equals(BACARDI_SPECIAL))) {
-            throw new RuntimeException("Too many drinks, max 2.");
+    }
+
+    private int calculateUnitPrice(Drink drink, boolean student) {
+        int price = drink.getPrice();
+        if (student && drink.isStudentDiscountEligible()) {
+            price = applyStudentDiscount(price);
         }
-        int price;
-        if (drink.equals(ONE_BEER)) {
-            price = BEER_PRICE;
-        } else if (drink.equals(ONE_CIDER)) {
-            price = CIDER_PRICE;
-        } else if (drink.equals(A_PROPER_CIDER)) {
-            price = PROPER_CIDER_PRICE;
-        } else if (drink.equals(GT)) {
-            price = GIN_PRICE + TONIC_WATER_PRICE + GREEN_STUFF_PRICE;
-        } else if (drink.equals(BACARDI_SPECIAL)) {
-            price = GIN_PRICE / 2 + RUM_PRICE + GRENADINE_PRICE + LIME_JUICE_PRICE;
-        } else {
-            throw new RuntimeException("No such drink exists");
-        }
-        if (student && (drink.equals(ONE_CIDER) || drink.equals(ONE_BEER) || drink.equals(A_PROPER_CIDER))) {
-            price = price - price / STUDENT_DISCOUNT_DIVISOR;
-        }
-        return price * amount;
+        return price;
+    }
+
+    private int applyStudentDiscount(int price) {
+        return price - price / STUDENT_DISCOUNT_DIVISOR;
     }
 }
